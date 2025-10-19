@@ -1,8 +1,8 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef } from 'react';
 import L, { divIcon } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import ReactDOMServer from 'react-dom/server';
 
 import PotholeIcon from '@/components/icons/PotholeIcon';
@@ -11,8 +11,7 @@ import DebrisIcon from '@/components/icons/DebrisIcon';
 import { cn } from '@/lib/utils';
 import { MapPin, AlertCircle, Clock } from 'lucide-react';
 
-// You have to manually set the icon images
-// see https://github.com/PaulLeCam/react-leaflet/issues/453
+// Manually set icon images to prevent build issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -77,40 +76,81 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 };
 
 export default function HazardMap() {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
     const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
 
-    return (
-      <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        />
+    useEffect(() => {
+      // Ensure this code only runs in the browser
+      if (mapRef.current && !mapInstanceRef.current) {
+        
+        // Create map instance
+        mapInstanceRef.current = L.map(mapRef.current).setView(mapCenter, 7);
 
-        {mockHazards.map(hazard => (
-            <Marker 
-                key={hazard.id} 
-                position={[hazard.location.lat, hazard.location.lon]} 
-                icon={HazardMarkerIcon({ type: hazard.type, severity: hazard.severity })}
-            >
-                <Popup>
-                    <div className="space-y-2 w-56 bg-card text-card-foreground">
-                        <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <MapPin className="mr-2 h-4 w-4" />
-                            <span>{hazard.location.lat}, {hazard.location.lon}</span>
-                        </div>
-                        <div className={cn("flex items-center text-sm", getSeverityColor(hazard.severity))}>
-                            <AlertCircle className="mr-2 h-4 w-4" />
-                            <span>Severity: {hazard.severity}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <Clock className="mr-2 h-4 w-4" />
-                            <span>Detected: {hazard.timeDetected}</span>
-                        </div>
+        // Add tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapInstanceRef.current);
+
+        // Add markers
+        mockHazards.forEach(hazard => {
+            const popupContent = ReactDOMServer.renderToString(
+                <div className="space-y-2 w-56 bg-card text-card-foreground p-1">
+                    <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        <span>{hazard.location.lat}, {hazard.location.lon}</span>
                     </div>
-                </Popup>
-            </Marker>
-        ))}
-      </MapContainer>
+                    <div className={cn("flex items-center text-sm", getSeverityColor(hazard.severity))}>
+                        <AlertCircle className="mr-2 h-4 w-4" />
+                        <span>Severity: {hazard.severity}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>Detected: {hazard.timeDetected}</span>
+                    </div>
+                </div>
+            );
+
+            L.marker([hazard.location.lat, hazard.location.lon], {
+                icon: HazardMarkerIcon({ type: hazard.type, severity: hazard.severity })
+            })
+            .addTo(mapInstanceRef.current)
+            .bindPopup(popupContent, {
+                className: 'bg-card border-none rounded-lg shadow-lg'
+            });
+        });
+      }
+
+      // Cleanup function to run when component unmounts
+      return () => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+        }
+      };
+    }, [mapCenter]);
+
+    // The Popup style in Leaflet can sometimes be buggy with custom classNames.
+    // Adding a global style block to ensure our popup style applies correctly.
+    return (
+      <>
+        <style>{`
+          .leaflet-popup-content-wrapper {
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border-radius: var(--radius);
+            box-shadow: none;
+            border: 1px solid hsl(var(--border));
+          }
+          .leaflet-popup-content {
+            margin: 0;
+          }
+          .leaflet-popup-tip-container {
+            display: none;
+          }
+        `}</style>
+        <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+      </>
     );
 }
