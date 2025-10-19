@@ -100,7 +100,7 @@ export default function DetectionDashboard() {
   useEffect(() => {
     if (hazards.length > 0 && !isVoiceAlertActive) {
         setIsVoiceAlertActive(true);
-        setTimeout(() => setIsVoiceAlertActive(false), 3000);
+        setTimeout(() => setIsVoiceAlertActive(false), 4000); // Extended duration
     }
   }, [hazards, isVoiceAlertActive]);
 
@@ -207,12 +207,12 @@ export default function DetectionDashboard() {
           </Card>
           
           {isVoiceAlertActive && (
-             <Card className="bg-primary text-primary-foreground animate-pulse-intense">
+             <Card className="bg-primary text-primary-foreground animate-pulse-intense rounded-lg">
                 <CardContent className="p-4 flex items-center gap-4">
                     <Volume2 size={32} />
                     <div>
                         <p className="font-bold">Voice Alert Active</p>
-                        <p className="text-sm opacity-80">Hazard detected ahead!</p>
+                        <p className="text-sm opacity-90">Hazard detected ahead!</p>
                     </div>
                 </CardContent>
             </Card>
