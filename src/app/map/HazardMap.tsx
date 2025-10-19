@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import ReactDOMServer from 'react-dom/server';
 
 import { cn } from '@/lib/utils';
-import { MapPin, AlertCircle, Clock } from 'lucide-react';
+import { MapPin, AlertCircle } from 'lucide-react';
 
 // Manually set icon images to prevent build issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -16,7 +16,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-type HazardType = 'Pothole' | 'Speed Breaker' | 'Debris';
 type Severity = 'Low' | 'Medium' | 'High';
 
 interface PotholePath {
@@ -28,28 +27,26 @@ interface PotholePath {
 }
 
 const mockPotholePaths: PotholePath[] = [
-  { id: 1, type: 'Pothole', path: [{ lat: 23.2599, lon: 77.4126 }, { lat: 23.2610, lon: 77.4150 }], severity: 'High', roadName: 'MG Road' },
-  { id: 2, type: 'Pothole', path: [{ lat: 12.9716, lon: 77.5946 }, { lat: 12.9720, lon: 77.6000 }], severity: 'Medium', roadName: 'Brigade Road' },
-  { id: 3, type: 'Pothole', path: [{ lat: 19.0760, lon: 72.8777 }, { lat: 19.0775, lon: 72.8800 }], severity: 'High', roadName: 'Marine Drive' },
-  { id: 4, type: 'Pothole', path: [{ lat: 28.6139, lon: 77.2090 }, { lat: 28.6150, lon: 77.2110 }], severity: 'Low', roadName: 'Connaught Place Outer Circle' },
-  { id: 5, type: 'Pothole', path: [{ lat: 22.5726, lon: 88.3639 }, { lat: 22.5740, lon: 88.3660 }], severity: 'Medium', roadName: 'Park Street' },
-  { id: 6, type: 'Pothole', path: [{ lat: 13.0827, lon: 80.2707 }, { lat: 13.0840, lon: 80.2725 }], severity: 'High', roadName: 'Anna Salai' },
-  { id: 7, type: 'Pothole', path: [{ lat: 23.2550, lon: 77.4010 }, { lat: 23.2565, lon: 77.4035 }], severity: 'Medium', roadName: 'VIP Road' },
-  { id: 8, type: 'Pothole', path: [{ lat: 12.9650, lon: 77.5900 }, { lat: 12.9665, lon: 77.5920 }], severity: 'Low', roadName: 'Lalbagh Road' },
-  { id: 9, type: 'Pothole', path: [{ lat: 19.0800, lon: 72.8750 }, { lat: 19.0815, lon: 72.8770 }], severity: 'High', roadName: 'Juhu Tara Road' },
+  { id: 1, type: 'Pothole', path: [{ lat: 12.9716, lon: 77.5946 }, { lat: 12.9720, lon: 77.6000 }], severity: 'Medium', roadName: 'Brigade Road' },
+  { id: 2, type: 'Pothole', path: [{ lat: 12.9757, lon: 77.5929 }, { lat: 12.9793, lon: 77.5913 }], severity: 'High', roadName: 'Palace Road' },
+  { id: 3, type: 'Pothole', path: [{ lat: 12.9698, lon: 77.5997 }, { lat: 12.9705, lon: 77.6030 }], severity: 'Low', roadName: 'Residency Road' },
+  { id: 4, type: 'Pothole', path: [{ lat: 12.9507, lon: 77.6207 }, { lat: 12.9525, lon: 77.6250 }], severity: 'High', roadName: 'Koramangala 80 Ft Rd' },
+  { id: 5, type: 'Pothole', path: [{ lat: 12.9345, lon: 77.6247 }, { lat: 12.9370, lon: 77.6200 }], severity: 'Medium', roadName: '1st A Main Rd, Koramangala' },
+  { id: 6, type: 'Pothole', path: [{ lat: 12.9926, lon: 77.5912 }, { lat: 12.9950, lon: 77.5880 }], severity: 'Low', roadName: 'Bellary Road' },
+  { id: 7, type: 'Pothole', path: [{ lat: 12.9240, lon: 77.5807 }, { lat: 12.9275, lon: 77.5830 }], severity: 'High', roadName: 'Bannerghatta Main Road' },
 ];
 
 
 export default function HazardMap() {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
-    const mapCenter: [number, number] = [23.0, 78.0]; // Centered on India
+    const mapCenter: [number, number] = [12.9716, 77.5946]; // Centered on Bengaluru
 
     useEffect(() => {
       if (typeof window === 'undefined') return;
       if (mapRef.current && !mapInstanceRef.current) {
         
-        const map = L.map(mapRef.current).setView(mapCenter, 5);
+        const map = L.map(mapRef.current).setView(mapCenter, 13);
         mapInstanceRef.current = map;
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
