@@ -59,12 +59,20 @@ export default function HazardMap() {
         mockPotholePaths.forEach(potholePath => {
             const latLngs = potholePath.path.map(p => L.latLng(p.lat, p.lon));
 
-            const polyline = L.polyline(latLngs, { 
-                color: '#ef4444', // red-500
-                weight: 6,
-                opacity: 0.9,
-                dashArray: '1, 8',
-                lineCap: 'round'
+            // Base red line
+            const redLine = L.polyline(latLngs, {
+              color: '#ef4444', // red-500
+              weight: 5,
+              opacity: 0.9
+            }).addTo(map);
+
+            // Black dots on top
+            const blackDots = L.polyline(latLngs, {
+              color: 'black',
+              weight: 5,
+              opacity: 0.9,
+              dashArray: '0, 10', // This creates the dots effect
+              lineCap: 'round'
             }).addTo(map);
 
             const popupContent = ReactDOMServer.renderToString(
@@ -81,7 +89,8 @@ export default function HazardMap() {
                 </div>
             );
             
-            polyline.bindPopup(popupContent, {
+            // Bind popup to the top layer (black dots) so it's clickable
+            blackDots.bindPopup(popupContent, {
                  className: 'bg-card border-none rounded-lg shadow-lg'
             });
         });
