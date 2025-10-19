@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { divIcon } from 'leaflet';
+import ReactDOMServer from 'react-dom/server';
+
 import { Card, CardContent } from '@/components/ui/card';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import PotholeIcon from '@/components/icons/PotholeIcon';
 import SpeedBreakerIcon from '@/components/icons/SpeedBreakerIcon';
 import DebrisIcon from '@/components/icons/DebrisIcon';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { MapPin, AlertCircle, Clock } from 'lucide-react';
 
@@ -18,30 +19,16 @@ interface Hazard {
   id: number;
   type: HazardType;
   location: { lat: number; lon: number };
-  position: { top: string; left: string };
   severity: Severity;
   timeDetected: string;
 }
 
 const mockHazards: Hazard[] = [
-  { id: 1, type: 'Pothole', location: { lat: 23.2599, lon: 77.4126 }, position: { top: '45%', left: '48%' }, severity: 'High', timeDetected: '2 mins ago' },
-  { id: 2, type: 'Speed Breaker', location: { lat: 23.1793, lon: 75.7849 }, position: { top: '55%', left: '22%' }, severity: 'Medium', timeDetected: '5 mins ago' },
-  { id: 3, type: 'Debris', location: { lat: 22.7196, lon: 75.8577 }, position: { top: '75%', left: '28%' }, severity: 'Low', timeDetected: '10 mins ago' },
-  { id: 4, type: 'Pothole', location: { lat: 24.5854, lon: 73.7125 }, position: { top: '20%', left: '70%' }, severity: 'Medium', timeDetected: '1 hour ago' },
+  { id: 1, type: 'Pothole', location: { lat: 23.2599, lon: 77.4126 }, severity: 'High', timeDetected: '2 mins ago' },
+  { id: 2, type: 'Speed Breaker', location: { lat: 23.1793, lon: 75.7849 }, severity: 'Medium', timeDetected: '5 mins ago' },
+  { id: 3, type: 'Debris', location: { lat: 22.7196, lon: 75.8577 }, severity: 'Low', timeDetected: '10 mins ago' },
+  { id: 4, type: 'Pothole', location: { lat: 24.5854, lon: 73.7125 }, severity: 'Medium', timeDetected: '1 hour ago' },
 ];
-
-const HazardIcon = ({ type }: { type: HazardType }) => {
-  switch (type) {
-    case 'Pothole':
-      return <PotholeIcon className="w-full h-full" />;
-    case 'Speed Breaker':
-      return <SpeedBreakerIcon className="w-full h-full" />;
-    case 'Debris':
-      return <DebrisIcon className="w-full h-full" />;
-    default:
-      return null;
-  }
-};
 
 const getSeverityColor = (severity: Severity) => {
     switch (severity) {
@@ -51,57 +38,74 @@ const getSeverityColor = (severity: Severity) => {
     }
 }
 
+const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Severity }) => {
+  const icon = () => {
+    switch (type) {
+      case 'Pothole':
+        return <PotholeIcon className="w-full h-full" />;
+      case 'Speed Breaker':
+        return <SpeedBreakerIcon className="w-full h-full" />;
+      case 'Debris':
+        return <DebrisIcon className="w-full h-full" />;
+      default:
+        return null;
+    }
+  }
+
+  return divIcon({
+    html: ReactDOMServer.renderToString(
+        <div className="relative w-10 h-10 -translate-x-1/2 -translate-y-1/2 transform transition-transform hover:scale-125 focus:outline-none">
+            <div className="absolute inset-0 bg-background/50 rounded-full blur-sm animate-pulse"></div>
+            <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(severity), 'bg-background')}>
+                {icon()}
+            </div>
+        </div>
+    ),
+    className: '',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+};
+
+
 export default function HazardMap() {
-  const mapImage = PlaceHolderImages.find((p) => p.id === 'map-background');
+  const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
 
   return (
     <Card className="shadow-lg">
       <CardContent className="p-2">
         <div className="relative w-full aspect-[4/3] bg-muted rounded-md overflow-hidden">
-          {mapImage && (
-            <Image
-              src={mapImage.imageUrl}
-              alt={mapImage.description}
-              data-ai-hint={mapImage.imageHint}
-              fill
-              className="object-cover"
+          <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          )}
-          {mockHazards.map((hazard) => (
-            <Popover key={hazard.id}>
-              <PopoverTrigger asChild>
-                <button
-                  className="absolute w-10 h-10 -translate-x-1/2 -translate-y-1/2 transform transition-transform hover:scale-125 focus:outline-none"
-                  style={{ top: hazard.position.top, left: hazard.position.left }}
-                >
-                  <div className="relative w-full h-full">
-                    <div className="absolute inset-0 bg-background/50 rounded-full blur-sm animate-pulse"></div>
-                    <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(hazard.severity), 'bg-background')}>
-                        <HazardIcon type={hazard.type} />
+            {mockHazards.map((hazard) => (
+              <Marker 
+                key={hazard.id} 
+                position={[hazard.location.lat, hazard.location.lon]}
+                icon={HazardMarkerIcon({type: hazard.type, severity: hazard.severity})}
+              >
+                <Popup>
+                    <div className="space-y-2 w-56">
+                        <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <MapPin className="mr-2 h-4 w-4" />
+                            <span>{hazard.location.lat}, {hazard.location.lon}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
+                            <span>Severity: {hazard.severity}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <Clock className="mr-2 h-4 w-4" />
+                            <span>Detected: {hazard.timeDetected}</span>
+                        </div>
                     </div>
-                  </div>
-                  <span className="sr-only">Hazard: {hazard.type}</span>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64">
-                <div className="space-y-2">
-                  <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    <span>{hazard.location.lat}, {hazard.location.lon}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
-                    <span>Severity: {hazard.severity}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Clock className="mr-2 h-4 w-4" />
-                    <span>Detected: {hazard.timeDetected}</span>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          ))}
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
       </CardContent>
     </Card>
