@@ -1,9 +1,9 @@
 'use client';
 
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { divIcon, Map as LeafletMap } from 'leaflet';
+import L, { divIcon } from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
-import { useEffect, useRef } from 'react';
 
 import PotholeIcon from '@/components/icons/PotholeIcon';
 import SpeedBreakerIcon from '@/components/icons/SpeedBreakerIcon';
@@ -32,7 +32,7 @@ const mockHazards: Hazard[] = [
 const getSeverityColor = (severity: Severity) => {
     switch (severity) {
         case 'High': return 'text-destructive';
-        case 'Medium': return 'text-yellow-500';
+        case 'Medium': return 'text-yellow-400';
         case 'Low': return 'text-green-500';
     }
 }
@@ -55,7 +55,7 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
     html: ReactDOMServer.renderToString(
         <div className="relative w-10 h-10 -translate-x-1/2 -translate-y-1/2 transform transition-transform hover:scale-125 focus:outline-none">
             <div className="absolute inset-0 bg-background/50 rounded-full blur-sm animate-pulse"></div>
-            <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(severity), 'bg-background')}>
+            <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(severity), 'bg-card')}>
                 {icon()}
             </div>
         </div>
@@ -67,38 +67,30 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 };
 
 export default function HazardMap() {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<LeafletMap | null>(null);
     const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
 
-    useEffect(() => {
-        if (mapRef.current && !mapInstanceRef.current) {
-            // Check if map is already initialized
-            if (mapRef.current.querySelector('.leaflet-container')) {
-                return;
-            }
-            
-            const map = L.map(mapRef.current).setView(mapCenter, 7);
-            mapInstanceRef.current = map;
+    return (
+      <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+        <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        />
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            mockHazards.forEach(hazard => {
-                const marker = L.marker([hazard.location.lat, hazard.location.lon], {
-                    icon: HazardMarkerIcon({type: hazard.type, severity: hazard.severity})
-                }).addTo(map);
-
-                const popupContent = ReactDOMServer.renderToString(
-                    <div className="space-y-2 w-56">
+        {mockHazards.map(hazard => (
+            <Marker 
+                key={hazard.id} 
+                position={[hazard.location.lat, hazard.location.lon]} 
+                icon={HazardMarkerIcon({ type: hazard.type, severity: hazard.severity })}
+            >
+                <Popup>
+                    <div className="space-y-2 w-56 bg-card text-card-foreground">
                         <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
                         <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="mr-2 h-4 w-4" />
                             <span>{hazard.location.lat}, {hazard.location.lon}</span>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
+                        <div className={cn("flex items-center text-sm", getSeverityColor(hazard.severity))}>
+                            <AlertCircle className="mr-2 h-4 w-4" />
                             <span>Severity: {hazard.severity}</span>
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground">
@@ -106,19 +98,9 @@ export default function HazardMap() {
                             <span>Detected: {hazard.timeDetected}</span>
                         </div>
                     </div>
-                );
-                marker.bindPopup(popupContent);
-            });
-        }
-
-        // Cleanup function to run when the component unmounts
-        return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
-        };
-    }, []); // Empty dependency array ensures this runs only once on mount
-
-    return <div ref={mapRef} style={{ height: '100%', width: '100%' }}></div>;
+                </Popup>
+            </Marker>
+        ))}
+      </MapContainer>
+    );
 }

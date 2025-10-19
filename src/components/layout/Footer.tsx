@@ -4,7 +4,7 @@ import Logo from '@/components/icons/Logo';
 
 const Footer = () => {
   return (
-    <footer className="border-t bg-card">
+    <footer className="border-t border-border/50 bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
@@ -15,7 +15,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6 md:mb-0">
             {NAV_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link key={link.href} href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 {link.label}
               </Link>
             ))}

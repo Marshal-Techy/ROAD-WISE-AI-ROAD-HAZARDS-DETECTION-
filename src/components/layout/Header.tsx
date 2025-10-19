@@ -13,7 +13,7 @@ const Header = () => {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6">
@@ -25,8 +25,8 @@ const Header = () => {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+                  'transition-colors hover:text-primary',
+                  pathname === link.href ? 'text-primary' : 'text-foreground/60'
                 )}
               >
                 {link.label}
@@ -71,8 +71,11 @@ const Header = () => {
             </SheetContent>
           </Sheet>
           <div className="hidden md:flex items-center gap-2">
-            <Button asChild>
-                <Link href="/dashboard">Get Started</Link>
+            <Button asChild variant="ghost" className="hover:bg-primary/20 hover:text-primary">
+                <Link href="/dashboard">Login</Link>
+            </Button>
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link href="/detection">Live Demo</Link>
             </Button>
           </div>
         </div>
