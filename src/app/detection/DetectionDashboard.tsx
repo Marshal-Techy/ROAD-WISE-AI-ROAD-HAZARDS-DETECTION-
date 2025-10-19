@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { calculateAdaptiveAlertDistance } from '@/ai/flows/adaptive-alert-distance';
 import { cn } from '@/lib/utils';
 
 type Hazard = {
@@ -80,16 +79,24 @@ export default function DetectionDashboard() {
   }, []);
 
   useEffect(() => {
-    const updateAlerts = async () => {
-      try {
-        const { alertDistanceMeters, alertLevel } = await calculateAdaptiveAlertDistance({ speedKmH: speed });
-        setAlertDistance(Math.round(alertDistanceMeters));
-        setAlertLevel(alertLevel);
-      } catch (error) {
-        console.error("Failed to calculate alert distance:", error);
+    // Client-side calculation to replace the AI call
+    const calculateAlerts = () => {
+      let distance, level: 'LOW' | 'MEDIUM' | 'HIGH';
+      if (speed > 80) {
+        distance = 250;
+        level = 'HIGH';
+      } else if (speed > 40) {
+        distance = 150;
+        level = 'MEDIUM';
+      } else {
+        distance = 75;
+        level = 'LOW';
       }
+      setAlertDistance(distance);
+      setAlertLevel(level);
     };
-    updateAlerts();
+    
+    calculateAlerts();
   }, [speed]);
 
   useEffect(() => {
