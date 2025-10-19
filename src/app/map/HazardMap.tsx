@@ -1,9 +1,9 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { divIcon } from 'leaflet';
+import L, { divIcon, Map as LeafletMap } from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
+import { useEffect, useRef } from 'react';
 
 import PotholeIcon from '@/components/icons/PotholeIcon';
 import SpeedBreakerIcon from '@/components/icons/SpeedBreakerIcon';
@@ -67,39 +67,58 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 };
 
 export default function HazardMap() {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<LeafletMap | null>(null);
     const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
 
-    return (
-      <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {mockHazards.map((hazard) => (
-            <Marker
-            key={hazard.id}
-            position={[hazard.location.lat, hazard.location.lon]}
-            icon={HazardMarkerIcon({type: hazard.type, severity: hazard.severity})}
-            >
-            <Popup>
-                <div className="space-y-2 w-56">
-                    <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                        <MapPin className="mr-2 h-4 w-4" />
-                        <span>{hazard.location.lat}, {hazard.location.lon}</span>
+    useEffect(() => {
+        if (mapRef.current && !mapInstanceRef.current) {
+            // Check if map is already initialized
+            if (mapRef.current.querySelector('.leaflet-container')) {
+                return;
+            }
+            
+            const map = L.map(mapRef.current).setView(mapCenter, 7);
+            mapInstanceRef.current = map;
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            mockHazards.forEach(hazard => {
+                const marker = L.marker([hazard.location.lat, hazard.location.lon], {
+                    icon: HazardMarkerIcon({type: hazard.type, severity: hazard.severity})
+                }).addTo(map);
+
+                const popupContent = ReactDOMServer.renderToString(
+                    <div className="space-y-2 w-56">
+                        <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <MapPin className="mr-2 h-4 w-4" />
+                            <span>{hazard.location.lat}, {hazard.location.lon}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
+                            <span>Severity: {hazard.severity}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                            <Clock className="mr-2 h-4 w-4" />
+                            <span>Detected: {hazard.timeDetected}</span>
+                        </div>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                        <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
-                        <span>Severity: {hazard.severity}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Detected: {hazard.timeDetected}</span>
-                    </div>
-                </div>
-            </Popup>
-            </Marker>
-        ))}
-    </MapContainer>
-    );
+                );
+                marker.bindPopup(popupContent);
+            });
+        }
+
+        // Cleanup function to run when the component unmounts
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, []); // Empty dependency array ensures this runs only once on mount
+
+    return <div ref={mapRef} style={{ height: '100%', width: '100%' }}></div>;
 }
