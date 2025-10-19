@@ -61,8 +61,10 @@ export default function HazardMap() {
 
             const polyline = L.polyline(latLngs, { 
                 color: '#ef4444', // red-500
-                weight: 5,
-                opacity: 0.8,
+                weight: 6,
+                opacity: 0.9,
+                dashArray: '1, 8',
+                lineCap: 'round'
             }).addTo(map);
 
             const popupContent = ReactDOMServer.renderToString(
@@ -105,6 +107,7 @@ export default function HazardMap() {
           }
           .leaflet-popup-content {
             margin: 0;
+            padding: 4px;
           }
           .leaflet-popup-tip-container {
             display: none;
