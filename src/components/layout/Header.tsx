@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Waypoints } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/icons/Logo';
@@ -47,6 +47,10 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
+              </SheetHeader>
               <Link href="/" className="mb-6">
                 <Logo />
               </Link>
