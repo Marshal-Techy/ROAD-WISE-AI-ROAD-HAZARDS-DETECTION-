@@ -1,4 +1,4 @@
-import HazardMap from './HazardMap';
+import MapLoader from './MapLoader';
 
 export default function MapPage() {
   return (
@@ -7,7 +7,7 @@ export default function MapPage() {
         <h1 className="text-4xl font-headline font-bold">Hazard Map</h1>
         <p className="text-muted-foreground">Interactive map showing detected hazards with real-time updates.</p>
       </div>
-      <HazardMap />
+      <MapLoader />
     </div>
   );
 }
