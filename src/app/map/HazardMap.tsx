@@ -56,6 +56,13 @@ export default function HazardMap() {
         mockPotholePaths.forEach(potholePath => {
             const latLngs = potholePath.path.map(p => L.latLng(p.lat, p.lon));
 
+            // Glow layer (thicker, lower opacity)
+            L.polyline(latLngs, {
+              color: '#ef4444', // red-500
+              weight: 12,
+              opacity: 0.3
+            }).addTo(map);
+            
             // Base red line
             const redLine = L.polyline(latLngs, {
               color: '#ef4444', // red-500
