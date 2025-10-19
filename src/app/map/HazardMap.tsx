@@ -1,7 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { divIcon } from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 
@@ -10,7 +10,6 @@ import SpeedBreakerIcon from '@/components/icons/SpeedBreakerIcon';
 import DebrisIcon from '@/components/icons/DebrisIcon';
 import { cn } from '@/lib/utils';
 import { MapPin, AlertCircle, Clock } from 'lucide-react';
-import { useEffect } from 'react';
 
 type HazardType = 'Pothole' | 'Speed Breaker' | 'Debris';
 type Severity = 'Low' | 'Medium' | 'High';
@@ -68,22 +67,17 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 };
 
 export default function HazardMap() {
-    const map = useMap()
     const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
-  
-    useEffect(() => {
-        map.setView(mapCenter, 7)
-    }, [map, mapCenter])
 
     return (
-    <>
+      <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {mockHazards.map((hazard) => (
-            <Marker 
-            key={hazard.id} 
+            <Marker
+            key={hazard.id}
             position={[hazard.location.lat, hazard.location.lon]}
             icon={HazardMarkerIcon({type: hazard.type, severity: hazard.severity})}
             >
@@ -106,6 +100,6 @@ export default function HazardMap() {
             </Popup>
             </Marker>
         ))}
-    </>
+    </MapContainer>
     );
 }

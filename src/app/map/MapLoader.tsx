@@ -2,8 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
-import { MapContainer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
 
 const HazardMap = dynamic(() => import('./HazardMap'), {
@@ -12,13 +10,8 @@ const HazardMap = dynamic(() => import('./HazardMap'), {
 });
 
 export default function MapLoader() {
-  const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
-
-  const displayMap = useMemo(() => (
-      <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-          <HazardMap />
-      </MapContainer>
-  ), []);
+  // useMemo is not strictly necessary here anymore but doesn't hurt.
+  const displayMap = useMemo(() => <HazardMap />, []);
 
   return (
     <Card className="shadow-lg">

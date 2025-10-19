@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { calculateAdaptiveAlertDistance } from '@/ai/flows/adaptive-alert-distance';
+import { cn } from '@/lib/utils';
 
 type Hazard = {
   id: number;
@@ -97,7 +98,7 @@ export default function DetectionDashboard() {
         setIsVoiceAlertActive(true);
         setTimeout(() => setIsVoiceAlertActive(false), 3000);
     }
-  }, [hazards]);
+  }, [hazards, isVoiceAlertActive]);
 
 
   const getAlertColor = () => {
