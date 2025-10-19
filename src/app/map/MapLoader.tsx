@@ -1,19 +1,19 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
-// Dynamically import the HazardMap component and disable SSR
-const HazardMap = dynamic(() => import('./HazardMap'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-muted">
-      <p>Loading map...</p>
-    </div>
-  ),
-});
-
 export default function MapLoader() {
+  const HazardMap = useMemo(
+    () =>
+      dynamic(() => import('./HazardMap'), {
+        loading: () => <p>A map is loading</p>,
+        ssr: false,
+      }),
+    []
+  );
+
   return (
     <Card className="shadow-lg">
       <CardContent className="p-2">
