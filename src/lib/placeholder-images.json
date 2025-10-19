@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "A car driving on a scenic highway at dusk.",
+      "imageUrl": "https://images.unsplash.com/photo-1675747158729-651e03a3d9bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2FyJTIwZHJpdmluZyUyMGhpZ2h3YXl8ZW58MHx8fHwxNzYwODYwNTEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car driving highway"
+    },
+    {
+      "id": "camera-feed",
+      "description": "A view from a dashboard camera on a city street.",
+      "imageUrl": "https://images.unsplash.com/photo-1756574564206-41d8eea27e57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxkYXNoYm9hcmQlMjBjYW1lcmElMjByb2FkfGVufDB8fHx8MTc2MDg2MDUxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dashboard camera road"
+    },
+    {
+      "id": "map-background",
+      "description": "An aerial view of a city map.",
+      "imageUrl": "https://images.unsplash.com/photo-1627508080523-2e798cf8eb0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaXR5JTIwbWFwJTIwYWVyaWFsfGVufDB8fHx8MTc2MDgwMDM2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city map aerial"
+    }
+  ]
 }
