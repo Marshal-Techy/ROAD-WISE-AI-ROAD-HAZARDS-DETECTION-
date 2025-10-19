@@ -17,21 +17,28 @@ type Hazard = {
   box: { top: string; left: string; width: string; height:string; };
 };
 
-const hazardTypes = ['Pothole', 'Speed Breaker', 'Debris'];
 
-const generateRandomHazard = (): Hazard => {
-  return {
-    id: Math.random(),
-    type: hazardTypes[Math.floor(Math.random() * hazardTypes.length)],
-    confidence: Math.random() * (0.99 - 0.7) + 0.7,
-    box: {
-      top: `${Math.random() * 60 + 20}%`,
-      left: `${Math.random() * 60 + 20}%`,
-      width: `${Math.random() * 15 + 10}%`,
-      height: `${Math.random() * 10 + 5}%`,
-    },
-  };
-};
+// Static hazards matching the new background image
+const staticHazards: Hazard[] = [
+  {
+    id: 1,
+    type: 'Pothole',
+    confidence: 0.92,
+    box: { top: '55%', left: '42%', width: '18%', height: '15%' },
+  },
+  {
+    id: 2,
+    type: 'Pothole',
+    confidence: 0.85,
+    box: { top: '48%', left: '75%', width: '12%', height: '10%' },
+  },
+  {
+    id: 3,
+    type: 'Debris',
+    confidence: 0.78,
+    box: { top: '70%', left: '15%', width: '15%', height: '8%' },
+  },
+];
 
 
 export default function DetectionDashboard() {
@@ -42,7 +49,7 @@ export default function DetectionDashboard() {
   const [hazards, setHazards] = useState<Hazard[]>([]);
   const [isVoiceAlertActive, setIsVoiceAlertActive] = useState(false);
 
-  const cameraFeedImage = PlaceHolderImages.find((p) => p.id === 'camera-feed');
+  const cameraFeedImage = PlaceHolderImages.find((p) => p.id === 'camera-feed-potholes');
 
   useEffect(() => {
     const speedInterval = setInterval(() => {
@@ -80,17 +87,8 @@ export default function DetectionDashboard() {
   }, [speed]);
 
   useEffect(() => {
-    const hazardInterval = setInterval(() => {
-      setHazards(prevHazards => {
-        const newHazards = prevHazards.filter(() => Math.random() > 0.3);
-        if (Math.random() > 0.5) {
-          newHazards.push(generateRandomHazard());
-        }
-        return newHazards.slice(0, 3);
-      });
-    }, 1500);
-
-    return () => clearInterval(hazardInterval);
+    // Set the static hazards on mount
+    setHazards(staticHazards);
   }, []);
 
   useEffect(() => {
