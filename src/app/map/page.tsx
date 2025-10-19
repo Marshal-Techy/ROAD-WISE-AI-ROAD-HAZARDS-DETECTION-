@@ -1,4 +1,9 @@
-import MapLoader from './MapLoader';
+import dynamic from 'next/dynamic';
+
+const HazardMap = dynamic(() => import('./HazardMap'), {
+  ssr: false,
+  loading: () => <p className="text-center p-4">Loading map...</p>,
+});
 
 export default function MapPage() {
   return (
@@ -8,7 +13,7 @@ export default function MapPage() {
         <p className="text-muted-foreground">Interactive map showing detected hazards with real-time updates.</p>
       </div>
       <div className="relative h-[600px] w-full bg-muted rounded-md overflow-hidden shadow-lg">
-          <MapLoader />
+        <HazardMap />
       </div>
     </div>
   );
