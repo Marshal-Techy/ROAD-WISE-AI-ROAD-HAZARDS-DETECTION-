@@ -24,31 +24,25 @@ const staticHazards: Hazard[] = [
     "id": 1,
     "type": "Pothole",
     "confidence": 0.92,
-    "box": { "top": "75%", "left": "35%", "width": "22%", "height": "15%" }
+    "box": { "top": "50%", "left": "45%", "width": "40%", "height": "25%" }
   },
   {
     "id": 2,
     "type": "Pothole",
     "confidence": 0.88,
-    "box": { "top": "60%", "left": "55%", "width": "18%", "height": "10%" }
+    "box": { "top": "45%", "left": "15%", "width": "20%", "height": "15%" }
   },
   {
     "id": 3,
     "type": "Pothole",
     "confidence": 0.85,
-    "box": { "top": "50%", "left": "40%", "width": "15%", "height": "8%" }
+    "box": { "top": "78%", "left": "5%", "width": "60%", "height": "20%" }
   },
   {
     "id": 4,
     "type": "Pothole",
     "confidence": 0.78,
-    "box": { "top": "68%", "left": "70%", "width": "25%", "height": "12%" }
-  },
-  {
-    "id": 5,
-    "type": "Pothole",
-    "confidence": 0.95,
-    "box": { "top": "85%", "left": "5%", "width": "28%", "height": "13%" }
+    "box": { "top": "42%", "left": "70%", "width": "25%", "height": "12%" }
   }
 ];
 
