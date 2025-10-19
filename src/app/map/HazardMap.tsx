@@ -32,17 +32,35 @@ interface Hazard {
 }
 
 const mockHazards: Hazard[] = [
-  { id: 1, type: 'Pothole', location: { lat: 23.2599, lon: 77.4126 }, severity: 'High', timeDetected: '2 mins ago' },
-  { id: 2, type: 'Speed Breaker', location: { lat: 23.1793, lon: 75.7849 }, severity: 'Medium', timeDetected: '5 mins ago' },
-  { id: 3, type: 'Debris', location: { lat: 22.7196, lon: 75.8577 }, severity: 'Low', timeDetected: '10 mins ago' },
-  { id: 4, type: 'Pothole', location: { lat: 24.5854, lon: 73.7125 }, severity: 'Medium', timeDetected: '1 hour ago' },
+    { id: 1, type: 'Pothole', location: { lat: 23.2599, lon: 77.4126 }, severity: 'High', timeDetected: '2 mins ago' },
+    { id: 2, type: 'Speed Breaker', location: { lat: 23.1793, lon: 75.7849 }, severity: 'Medium', timeDetected: '5 mins ago' },
+    { id: 3, type: 'Debris', location: { lat: 22.7196, lon: 75.8577 }, severity: 'Low', timeDetected: '10 mins ago' },
+    { id: 4, type: 'Pothole', location: { lat: 24.5854, lon: 73.7125 }, severity: 'Medium', timeDetected: '1 hour ago' },
+    { id: 5, type: 'Pothole', location: { lat: 23.27, lon: 77.42 }, severity: 'High', timeDetected: '3 mins ago' },
+    { id: 6, type: 'Debris', location: { lat: 23.185, lon: 75.79 }, severity: 'Low', timeDetected: '15 mins ago' },
+    { id: 7, type: 'Speed Breaker', location: { lat: 22.725, lon: 75.86 }, severity: 'Medium', timeDetected: '8 mins ago' },
+    { id: 8, type: 'Pothole', location: { lat: 24.59, lon: 73.72 }, severity: 'High', timeDetected: '2 hours ago' },
+    { id: 9, type: 'Pothole', location: { lat: 22.71, lon: 75.85 }, severity: 'Low', timeDetected: '30 mins ago' },
+    { id: 10, type: 'Debris', location: { lat: 23.25, lon: 77.40 }, severity: 'Medium', timeDetected: '45 mins ago' },
+    { id: 11, type: 'Pothole', location: { lat: 19.0760, lon: 72.8777 }, severity: 'High', timeDetected: '5 mins ago' }, // Mumbai
+    { id: 12, type: 'Speed Breaker', location: { lat: 28.6139, lon: 77.2090 }, severity: 'Medium', timeDetected: '12 mins ago' }, // Delhi
+    { id: 13, type: 'Debris', location: { lat: 12.9716, lon: 77.5946 }, severity: 'Low', timeDetected: '25 mins ago' }, // Bangalore
+    { id: 14, type: 'Pothole', location: { lat: 13.0827, lon: 80.2707 }, severity: 'High', timeDetected: '8 mins ago' }, // Chennai
+    { id: 15, type: 'Speed Breaker', location: { lat: 22.5726, lon: 88.3639 }, severity: 'Medium', timeDetected: '20 mins ago' }, // Kolkata
 ];
 
 const getSeverityColor = (severity: Severity) => {
     switch (severity) {
         case 'High': return 'text-destructive';
-        case 'Medium': return 'text-yellow-400';
-        case 'Low': return 'text-green-500';
+        case 'Medium': return 'text-yellow-500';
+        case 'Low': return 'text-green-600';
+    }
+}
+const getGlowColor = (severity: Severity) => {
+    switch (severity) {
+        case 'High': return 'shadow-[0_0_15px_3px_rgba(255,50,50,0.7)]';
+        case 'Medium': return 'shadow-[0_0_15px_3px_rgba(255,200,0,0.7)]';
+        case 'Low': return 'shadow-[0_0_15px_3px_rgba(50,200,50,0.7)]';
     }
 }
 
@@ -63,8 +81,8 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
   return divIcon({
     html: ReactDOMServer.renderToString(
         <div className="relative w-10 h-10 -translate-x-1/2 -translate-y-1/2 transform transition-transform hover:scale-125 focus:outline-none">
-            <div className="absolute inset-0 bg-background/50 rounded-full blur-sm animate-pulse"></div>
-            <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(severity), 'bg-card')}>
+             <div className={cn("absolute inset-0 rounded-full blur-sm", getGlowColor(severity))}></div>
+            <div className={cn("relative w-full h-full p-1.5 rounded-full shadow-lg", getSeverityColor(severity), 'bg-card/90 backdrop-blur-sm')}>
                 {icon()}
             </div>
         </div>
@@ -78,21 +96,18 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 export default function HazardMap() {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
-    const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
+    const mapCenter: [number, number] = [23.0, 78.0]; // Centered on India
 
     useEffect(() => {
-      // Ensure this code only runs in the browser
+      if (typeof window === 'undefined') return;
       if (mapRef.current && !mapInstanceRef.current) {
         
-        // Create map instance
-        mapInstanceRef.current = L.map(mapRef.current).setView(mapCenter, 7);
+        mapInstanceRef.current = L.map(mapRef.current).setView(mapCenter, 6);
 
-        // Add tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         }).addTo(mapInstanceRef.current);
 
-        // Add markers
         mockHazards.forEach(hazard => {
             const popupContent = ReactDOMServer.renderToString(
                 <div className="space-y-2 w-56 bg-card text-card-foreground p-1">
@@ -122,17 +137,14 @@ export default function HazardMap() {
         });
       }
 
-      // Cleanup function to run when component unmounts
       return () => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.remove();
           mapInstanceRef.current = null;
         }
       };
-    }, [mapCenter]);
+    }, []);
 
-    // The Popup style in Leaflet can sometimes be buggy with custom classNames.
-    // Adding a global style block to ensure our popup style applies correctly.
     return (
       <>
         <style>{`
