@@ -1,16 +1,16 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { divIcon } from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 
-import { Card, CardContent } from '@/components/ui/card';
 import PotholeIcon from '@/components/icons/PotholeIcon';
 import SpeedBreakerIcon from '@/components/icons/SpeedBreakerIcon';
 import DebrisIcon from '@/components/icons/DebrisIcon';
 import { cn } from '@/lib/utils';
 import { MapPin, AlertCircle, Clock } from 'lucide-react';
+import { useEffect } from 'react';
 
 type HazardType = 'Pothole' | 'Speed Breaker' | 'Debris';
 type Severity = 'Low' | 'Medium' | 'High';
@@ -67,47 +67,45 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
   });
 };
 
-
 export default function HazardMap() {
-  const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
+    const map = useMap()
+    const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
+  
+    useEffect(() => {
+        map.setView(mapCenter, 7)
+    }, [map, mapCenter])
 
-  return (
-    <Card className="shadow-lg">
-      <CardContent className="p-2">
-        <div className="relative w-full aspect-[4/3] bg-muted rounded-md overflow-hidden">
-          <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {mockHazards.map((hazard) => (
-              <Marker 
-                key={hazard.id} 
-                position={[hazard.location.lat, hazard.location.lon]}
-                icon={HazardMarkerIcon({type: hazard.type, severity: hazard.severity})}
-              >
-                <Popup>
-                    <div className="space-y-2 w-56">
-                        <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <MapPin className="mr-2 h-4 w-4" />
-                            <span>{hazard.location.lat}, {hazard.location.lon}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
-                            <span>Severity: {hazard.severity}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                            <Clock className="mr-2 h-4 w-4" />
-                            <span>Detected: {hazard.timeDetected}</span>
-                        </div>
+    return (
+    <>
+        <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {mockHazards.map((hazard) => (
+            <Marker 
+            key={hazard.id} 
+            position={[hazard.location.lat, hazard.location.lon]}
+            icon={HazardMarkerIcon({type: hazard.type, severity: hazard.severity})}
+            >
+            <Popup>
+                <div className="space-y-2 w-56">
+                    <h3 className="font-headline font-semibold leading-none tracking-tight">{hazard.type}</h3>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        <span>{hazard.location.lat}, {hazard.location.lon}</span>
                     </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <AlertCircle className={cn("mr-2 h-4 w-4", getSeverityColor(hazard.severity))} />
+                        <span>Severity: {hazard.severity}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>Detected: {hazard.timeDetected}</span>
+                    </div>
+                </div>
+            </Popup>
+            </Marker>
+        ))}
+    </>
+    );
 }
