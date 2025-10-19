@@ -8,9 +8,9 @@
     },
     {
       "id": "camera-feed-potholes",
-      "description": "A road with several potholes seen from a driver's perspective.",
-      "imageUrl": "https://images.unsplash.com/photo-1596399801642-177b945c7b3c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyb2FkJTIwd2l0aCUyMHBvdGhvbGVzfGVufDB8fHx8MTc2MDk0OTk4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "road potholes"
+      "description": "A damaged road with many potholes in a forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1548455325-045d94943899?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYW1hZ2VkJTIwcm9hZCUyMHdpdGglMjBwb3Rob2xlcyUyMGluJTIwZm9yZXN0fGVufDB8fHx8MTc2MDk2NTA0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "potholes road"
     },
     {
       "id": "map-background",
