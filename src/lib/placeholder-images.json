@@ -14,9 +14,9 @@
     },
     {
       "id": "map-background",
-      "description": "An aerial view of a city map.",
-      "imageUrl": "https://images.unsplash.com/photo-1627508080523-2e798cf8eb0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaXR5JTIwbWFwJTIwYWVyaWFsfGVufDB8fHx8MTc2MDgwMDM2OXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "city map aerial"
+      "description": "A satellite map view of Madhya Pradesh, India.",
+      "imageUrl": "https://images.unsplash.com/photo-1594132336336-3972410193b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXB8ZW58MHx8fHwxNjE2NzU5NjU0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "map India"
     }
   ]
 }

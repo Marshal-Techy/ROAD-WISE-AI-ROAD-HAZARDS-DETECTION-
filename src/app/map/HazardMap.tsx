@@ -24,10 +24,10 @@ interface Hazard {
 }
 
 const mockHazards: Hazard[] = [
-  { id: 1, type: 'Pothole', location: { lat: 12.974, lon: 77.601 }, position: { top: '30%', left: '50%' }, severity: 'High', timeDetected: '2 mins ago' },
-  { id: 2, type: 'Speed Breaker', location: { lat: 12.969, lon: 77.592 }, position: { top: '55%', left: '42%' }, severity: 'Medium', timeDetected: '5 mins ago' },
-  { id: 3, type: 'Debris', location: { lat: 12.978, lon: 77.595 }, position: { top: '25%', left: '65%' }, severity: 'Low', timeDetected: '10 mins ago' },
-  { id: 4, type: 'Pothole', location: { lat: 12.965, lon: 77.610 }, position: { top: '70%', left: '75%' }, severity: 'Medium', timeDetected: '1 hour ago' },
+  { id: 1, type: 'Pothole', location: { lat: 23.2599, lon: 77.4126 }, position: { top: '45%', left: '48%' }, severity: 'High', timeDetected: '2 mins ago' },
+  { id: 2, type: 'Speed Breaker', location: { lat: 23.1793, lon: 75.7849 }, position: { top: '55%', left: '22%' }, severity: 'Medium', timeDetected: '5 mins ago' },
+  { id: 3, type: 'Debris', location: { lat: 22.7196, lon: 75.8577 }, position: { top: '75%', left: '28%' }, severity: 'Low', timeDetected: '10 mins ago' },
+  { id: 4, type: 'Pothole', location: { lat: 24.5854, lon: 73.7125 }, position: { top: '20%', left: '70%' }, severity: 'Medium', timeDetected: '1 hour ago' },
 ];
 
 const HazardIcon = ({ type }: { type: HazardType }) => {
