@@ -69,6 +69,10 @@ const HazardMarkerIcon = ({ type, severity }: { type: HazardType, severity: Seve
 export default function HazardMap() {
     const mapCenter: [number, number] = [23.8, 78.5]; // Centered on Madhya Pradesh, India
 
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
     return (
       <MapContainer center={mapCenter} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer

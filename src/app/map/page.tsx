@@ -7,7 +7,9 @@ export default function MapPage() {
         <h1 className="text-4xl font-headline font-bold">Hazard Map</h1>
         <p className="text-muted-foreground">Interactive map showing detected hazards with real-time updates.</p>
       </div>
-      <MapLoader />
+      <div className="relative h-[600px] w-full bg-muted rounded-md overflow-hidden shadow-lg">
+          <MapLoader />
+      </div>
     </div>
   );
 }
