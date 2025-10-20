@@ -56,7 +56,7 @@ export default function HazardMap() {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
     const tileLayerRef = useRef<L.TileLayer | null>(null);
-    const [mapStyle, setMapStyle] = useState<MapStyle>('light');
+    const [mapStyle, setMapStyle] = useState<MapStyle>('satellite');
     const mapCenter: [number, number] = [12.9716, 77.5946]; // Centered on Bengaluru
 
     useEffect(() => {
@@ -110,6 +110,7 @@ export default function HazardMap() {
           mapInstanceRef.current = null;
         }
       };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -126,8 +127,9 @@ export default function HazardMap() {
       <div className="relative w-full h-full">
         <style>{`
           .leaflet-popup-content-wrapper {
-            background: hsl(var(--card) / 0.9);
-            backdrop-filter: blur(4px);
+            background: hsl(var(--card) / 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             color: hsl(var(--card-foreground));
             border-radius: var(--radius);
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -142,8 +144,9 @@ export default function HazardMap() {
           }
           .leaflet-control-zoom {
             border: 1px solid hsl(var(--border) / 0.5) !important;
-            background-color: hsl(var(--card) / 0.9) !important;
-            backdrop-filter: blur(4px);
+            background-color: hsl(var(--card) / 0.8) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
           }
           .leaflet-control-zoom a {
             color: hsl(var(--foreground)) !important;
@@ -151,7 +154,7 @@ export default function HazardMap() {
         `}</style>
         <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
         <div className="absolute top-4 right-4 z-[1000]">
-            <Card className="bg-card/80 backdrop-blur-sm">
+            <Card className="bg-card/80 backdrop-blur-sm shadow-xl">
                 <CardContent className="p-3">
                     <div className="flex items-center space-x-3">
                         <MapIcon className="text-muted-foreground" />
