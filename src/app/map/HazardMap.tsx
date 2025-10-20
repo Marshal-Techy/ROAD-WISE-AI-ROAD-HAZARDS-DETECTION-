@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import ReactDOMServer from 'react-dom/server';
 
 import { cn } from '@/lib/utils';
-import { MapPin, AlertCircle } from 'lucide-react';
+import { MapPin, AlertCircle, Satellite, Map as MapIcon } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 // Manually set icon images to prevent build issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -17,6 +20,7 @@ L.Icon.Default.mergeOptions({
 });
 
 type Severity = 'Low' | 'Medium' | 'High';
+type MapStyle = 'light' | 'satellite';
 
 interface PotholePath {
   id: number;
@@ -27,55 +31,56 @@ interface PotholePath {
 }
 
 const mockPotholePaths: PotholePath[] = [
-  { id: 1, type: 'Pothole', path: [{ lat: 12.9716, lon: 77.5946 }, { lat: 12.9720, lon: 77.6000 }], severity: 'Medium', roadName: 'Brigade Road' },
-  { id: 2, type: 'Pothole', path: [{ lat: 12.9757, lon: 77.5929 }, { lat: 12.9793, lon: 77.5913 }], severity: 'High', roadName: 'Palace Road' },
-  { id: 3, type: 'Pothole', path: [{ lat: 12.9698, lon: 77.5997 }, { lat: 12.9705, lon: 77.6030 }], severity: 'Low', roadName: 'Residency Road' },
-  { id: 4, type: 'Pothole', path: [{ lat: 12.9507, lon: 77.6207 }, { lat: 12.9525, lon: 77.6250 }], severity: 'High', roadName: 'Koramangala 80 Ft Rd' },
-  { id: 5, type: 'Pothole', path: [{ lat: 12.9345, lon: 77.6247 }, { lat: 12.9370, lon: 77.6200 }], severity: 'Medium', roadName: '1st A Main Rd, Koramangala' },
-  { id: 6, type: 'Pothole', path: [{ lat: 12.9926, lon: 77.5912 }, { lat: 12.9950, lon: 77.5880 }], severity: 'Low', roadName: 'Bellary Road' },
-  { id: 7, type: 'Pothole', path: [{ lat: 12.9240, lon: 77.5807 }, { lat: 12.9275, lon: 77.5830 }], severity: 'High', roadName: 'Bannerghatta Main Road' },
+    { id: 1, type: 'Pothole', path: [{ lat: 12.9716, lon: 77.5946 }, { lat: 12.9720, lon: 77.6000 }], severity: 'Medium', roadName: 'Brigade Road' },
+    { id: 2, type: 'Pothole', path: [{ lat: 12.9757, lon: 77.5929 }, { lat: 12.9793, lon: 77.5913 }], severity: 'High', roadName: 'Palace Road' },
+    { id: 3, type: 'Pothole', path: [{ lat: 12.9698, lon: 77.5997 }, { lat: 12.9705, lon: 77.6030 }], severity: 'Low', roadName: 'Residency Road' },
+    { id: 4, type: 'Pothole', path: [{ lat: 12.9507, lon: 77.6207 }, { lat: 12.9525, lon: 77.6250 }], severity: 'High', roadName: 'Koramangala 80 Ft Rd' },
+    { id: 5, type: 'Pothole', path: [{ lat: 12.9345, lon: 77.6247 }, { lat: 12.9370, lon: 77.6200 }], severity: 'Medium', roadName: '1st A Main Rd, Koramangala' },
+    { id: 6, type: 'Pothole', path: [{ lat: 12.9926, lon: 77.5912 }, { lat: 12.9950, lon: 77.5880 }], severity: 'Low', roadName: 'Bellary Road' },
+    { id: 7, type: 'Pothole', path: [{ lat: 12.9240, lon: 77.5807 }, { lat: 12.9275, lon: 77.5830 }], severity: 'High', roadName: 'Bannerghatta Main Road' },
 ];
+
+const tileLayers: Record<MapStyle, { url: string; attribution: string }> = {
+    light: {
+      url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    },
+    satellite: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    },
+};
 
 
 export default function HazardMap() {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
+    const tileLayerRef = useRef<L.TileLayer | null>(null);
+    const [mapStyle, setMapStyle] = useState<MapStyle>('light');
     const mapCenter: [number, number] = [12.9716, 77.5946]; // Centered on Bengaluru
 
     useEffect(() => {
       if (typeof window === 'undefined') return;
       if (mapRef.current && !mapInstanceRef.current) {
         
-        const map = L.map(mapRef.current).setView(mapCenter, 13);
+        const map = L.map(mapRef.current, { zoomControl: false }).setView(mapCenter, 13);
         mapInstanceRef.current = map;
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        }).addTo(map);
+        const currentTile = tileLayers[mapStyle];
+        tileLayerRef.current = L.tileLayer(currentTile.url, { attribution: currentTile.attribution }).addTo(map);
 
         mockPotholePaths.forEach(potholePath => {
             const latLngs = potholePath.path.map(p => L.latLng(p.lat, p.lon));
 
-            // Glow layer (thicker, lower opacity)
-            L.polyline(latLngs, {
-              color: '#ef4444', // red-500
-              weight: 12,
-              opacity: 0.3
-            }).addTo(map);
+            L.polyline(latLngs, { color: '#ef4444', weight: 12, opacity: 0.3 }).addTo(map);
+            L.polyline(latLngs, { color: '#ef4444', weight: 5, opacity: 0.9 }).addTo(map);
             
-            // Base red line
-            const redLine = L.polyline(latLngs, {
-              color: '#ef4444', // red-500
-              weight: 5,
-              opacity: 0.9
-            }).addTo(map);
-
-            // Black dots on top
             const blackDots = L.polyline(latLngs, {
               color: 'black',
               weight: 5,
               opacity: 0.9,
-              dashArray: '0, 10', // This creates the dots effect
+              dashArray: '0, 10',
               lineCap: 'round'
             }).addTo(map);
 
@@ -86,14 +91,13 @@ export default function HazardMap() {
                         <MapPin className="mr-2 h-4 w-4" />
                         <span>{potholePath.roadName}</span>
                     </div>
-                    <div className={cn("flex items-center text-sm text-red-500")}>
+                    <div className={cn("flex items-center text-sm text-red-500 font-medium")}>
                         <AlertCircle className="mr-2 h-4 w-4" />
                         <span>Severity: {potholePath.severity}</span>
                     </div>
                 </div>
             );
             
-            // Bind popup to the top layer (black dots) so it's clickable
             blackDots.bindPopup(popupContent, {
                  className: 'bg-card border-none rounded-lg shadow-lg'
             });
@@ -108,15 +112,26 @@ export default function HazardMap() {
       };
     }, []);
 
+    useEffect(() => {
+        if (tileLayerRef.current) {
+            const newTile = tileLayers[mapStyle];
+            tileLayerRef.current.setUrl(newTile.url);
+            tileLayerRef.current.options.attribution = newTile.attribution;
+            tileLayerRef.current.redraw();
+        }
+    }, [mapStyle]);
+
+
     return (
-      <>
+      <div className="relative w-full h-full">
         <style>{`
           .leaflet-popup-content-wrapper {
-            background: hsl(var(--card));
+            background: hsl(var(--card) / 0.9);
+            backdrop-filter: blur(4px);
             color: hsl(var(--card-foreground));
             border-radius: var(--radius);
-            box-shadow: none;
-            border: 1px solid hsl(var(--border));
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid hsl(var(--border) / 0.5);
           }
           .leaflet-popup-content {
             margin: 0;
@@ -125,8 +140,33 @@ export default function HazardMap() {
           .leaflet-popup-tip-container {
             display: none;
           }
+          .leaflet-control-zoom {
+            border: 1px solid hsl(var(--border) / 0.5) !important;
+            background-color: hsl(var(--card) / 0.9) !important;
+            backdrop-filter: blur(4px);
+          }
+          .leaflet-control-zoom a {
+            color: hsl(var(--foreground)) !important;
+          }
         `}</style>
         <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
-      </>
+        <div className="absolute top-4 right-4 z-[1000]">
+            <Card className="bg-card/80 backdrop-blur-sm">
+                <CardContent className="p-3">
+                    <div className="flex items-center space-x-3">
+                        <MapIcon className="text-muted-foreground" />
+                        <Label htmlFor="map-style-toggle" className="font-medium text-sm">Light</Label>
+                        <Switch 
+                            id="map-style-toggle"
+                            checked={mapStyle === 'satellite'}
+                            onCheckedChange={(checked) => setMapStyle(checked ? 'satellite' : 'light')}
+                        />
+                        <Label htmlFor="map-style-toggle" className="font-medium text-sm">Satellite</Label>
+                        <Satellite className="text-muted-foreground" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+      </div>
     );
 }
