@@ -105,11 +105,13 @@ export default function DetectionDashboard() {
   }, []);
 
   useEffect(() => {
-    if (hazards.length > 0 && !isVoiceAlertActive) {
-        setIsVoiceAlertActive(true);
-        setTimeout(() => setIsVoiceAlertActive(false), 4000); // Extended duration
+    let timeoutId: NodeJS.Timeout;
+    if (hazards.length > 0) {
+      setIsVoiceAlertActive(true);
+      timeoutId = setTimeout(() => setIsVoiceAlertActive(false), 4000); // Extended duration
     }
-  }, [hazards, isVoiceAlertActive]);
+    return () => clearTimeout(timeoutId);
+  }, [hazards]);
 
 
   const getAlertColor = () => {
