@@ -31,13 +31,13 @@ interface PotholePath {
 }
 
 const mockPotholePaths: PotholePath[] = [
-    { id: 1, type: 'Pothole', path: [{ lat: 12.9716, lon: 77.5946 }, { lat: 12.9720, lon: 77.6000 }], severity: 'Medium', roadName: 'Brigade Road' },
-    { id: 2, type: 'Pothole', path: [{ lat: 12.9757, lon: 77.5929 }, { lat: 12.9793, lon: 77.5913 }], severity: 'High', roadName: 'Palace Road' },
-    { id: 3, type: 'Pothole', path: [{ lat: 12.9698, lon: 77.5997 }, { lat: 12.9705, lon: 77.6030 }], severity: 'Low', roadName: 'Residency Road' },
-    { id: 4, type: 'Pothole', path: [{ lat: 12.9507, lon: 77.6207 }, { lat: 12.9525, lon: 77.6250 }], severity: 'High', roadName: 'Koramangala 80 Ft Rd' },
-    { id: 5, type: 'Pothole', path: [{ lat: 12.9345, lon: 77.6247 }, { lat: 12.9370, lon: 77.6200 }], severity: 'Medium', roadName: '1st A Main Rd, Koramangala' },
-    { id: 6, type: 'Pothole', path: [{ lat: 12.9926, lon: 77.5912 }, { lat: 12.9950, lon: 77.5880 }], severity: 'Low', roadName: 'Bellary Road' },
-    { id: 7, type: 'Pothole', path: [{ lat: 12.9240, lon: 77.5807 }, { lat: 12.9275, lon: 77.5830 }], severity: 'High', roadName: 'Bannerghatta Main Road' },
+    { id: 1, type: 'Pothole', path: [ { lat: 12.97194, lon: 77.5946 }, { lat: 12.9718, lon: 77.5966 }, { lat: 12.9716, lon: 77.5986 }, { lat: 12.9710, lon: 77.6000 } ], severity: 'Medium', roadName: 'Kasturba Road' },
+    { id: 2, type: 'Pothole', path: [ { lat: 12.9757, lon: 77.5929 }, { lat: 12.9775, lon: 77.5922 }, { lat: 12.9793, lon: 77.5913 } ], severity: 'High', roadName: 'Palace Road' },
+    { id: 3, type: 'Pothole', path: [ { lat: 12.9698, lon: 77.5997 }, { lat: 12.9699, lon: 77.6015 }, { lat: 12.9705, lon: 77.6030 } ], severity: 'Low', roadName: 'Residency Road' },
+    { id: 4, type: 'Pothole', path: [ { lat: 12.9507, lon: 77.6207 }, { lat: 12.9515, lon: 77.6225 }, { lat: 12.9525, lon: 77.6250 } ], severity: 'High', roadName: '100 Feet Road, Indiranagar' },
+    { id: 5, type: 'Pothole', path: [ { lat: 12.9345, lon: 77.6247 }, { lat: 12.9355, lon: 77.6225 }, { lat: 12.9370, lon: 77.6200 } ], severity: 'Medium', roadName: 'Koramangala 1st A Main Rd' },
+    { id: 6, type: 'Pothole', path: [ { lat: 12.9926, lon: 77.5912 }, { lat: 12.9938, lon: 77.5900 }, { lat: 12.9950, lon: 77.5880 } ], severity: 'Low', roadName: 'Bellary Road' },
+    { id: 7, type: 'Pothole', path: [ { lat: 12.9240, lon: 77.5807 }, { lat: 12.9255, lon: 77.5818 }, { lat: 12.9275, lon: 77.5830 } ], severity: 'High', roadName: 'Bannerghatta Main Road' },
 ];
 
 const tileLayers: Record<MapStyle, { url: string; attribution: string }> = {
