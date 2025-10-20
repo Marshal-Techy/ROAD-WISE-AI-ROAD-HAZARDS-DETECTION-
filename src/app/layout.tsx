@@ -18,7 +18,7 @@ const spaceGrotesk = Space_Grotesk({
 
 
 export const metadata: Metadata = {
-  title: "RoadWise - AI Road Safety Assistant",
+  title: "PathPatrol - AI Road Safety Assistant",
   description: "Detect • Predict • Alert – Drive Smarter, Drive Safer.",
 };
 

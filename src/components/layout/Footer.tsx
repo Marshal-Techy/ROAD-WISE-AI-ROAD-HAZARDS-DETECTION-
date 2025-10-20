@@ -21,7 +21,7 @@ const Footer = () => {
             ))}
           </div>
           <div className="text-center md:text-right">
-             <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} RoadWise. All Rights Reserved.</p>
+             <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} PathPatrol. All Rights Reserved.</p>
              <p className="text-xs text-muted-foreground/80 mt-1">Project by Team Integrated Innovators BLR</p>
           </div>
         </div>

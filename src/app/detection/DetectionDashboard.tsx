@@ -53,6 +53,7 @@ export default function DetectionDashboard() {
   const [alertLevel, setAlertLevel] = useState<'LOW' | 'MEDIUM' | 'HIGH'>('MEDIUM');
   const [hazards, setHazards] = useState<Hazard[]>([]);
   const [isVoiceAlertActive, setIsVoiceAlertActive] = useState(false);
+  const [voiceAlertTimer, setVoiceAlertTimer] = useState<NodeJS.Timeout | null>(null);
 
   const cameraFeedImage = PlaceHolderImages.find((p) => p.id === 'camera-feed-potholes');
 
@@ -105,12 +106,24 @@ export default function DetectionDashboard() {
   }, []);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
     if (hazards.length > 0) {
+      if (voiceAlertTimer) {
+        clearTimeout(voiceAlertTimer);
+      }
       setIsVoiceAlertActive(true);
-      timeoutId = setTimeout(() => setIsVoiceAlertActive(false), 4000); // Extended duration
+      const newTimeoutId = setTimeout(() => {
+        setIsVoiceAlertActive(false);
+      }, 4000);
+      setVoiceAlertTimer(newTimeoutId);
     }
-    return () => clearTimeout(timeoutId);
+    
+    // Cleanup on unmount
+    return () => {
+      if (voiceAlertTimer) {
+        clearTimeout(voiceAlertTimer);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hazards]);
 
 
@@ -127,7 +140,7 @@ export default function DetectionDashboard() {
     <div className="container mx-auto p-4 md:p-8">
        <div className="text-center mb-8">
         <h1 className="text-4xl font-headline font-bold">Real-Time Detection Dashboard</h1>
-        <p className="text-muted-foreground">Live simulation of RoadWise AI in action.</p>
+        <p className="text-muted-foreground">Live simulation of PathPatrol AI in action.</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
