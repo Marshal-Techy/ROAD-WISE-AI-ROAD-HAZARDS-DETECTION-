@@ -6,8 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 const steps = [
   {
     icon: Camera,
-    label: "Camera Input",
-    description: "Vehicle's camera captures road footage.",
+    label: "Multi-Source Data Input",
+    description: "Multi Data Input like Signal-CCTV, Fleet optix, dashcam, uploading video etc.",
   },
   {
     icon: Cpu,
