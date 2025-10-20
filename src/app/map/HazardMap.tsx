@@ -30,7 +30,6 @@ interface PotholePath {
   roadName: string;
 }
 
-// Updated paths to more accurately follow roads in Bengaluru
 const mockPotholePaths: PotholePath[] = [
     { id: 1, type: 'Pothole', path: [ { lat: 12.9720, lon: 77.5942 }, { lat: 12.9718, lon: 77.5955 }, { lat: 12.9716, lon: 77.5968 }, { lat: 12.9713, lon: 77.5982 }, { lat: 12.9710, lon: 77.5993 } ], severity: 'Medium', roadName: 'Kasturba Road' },
     { id: 2, type: 'Pothole', path: [ { lat: 12.9757, lon: 77.5929 }, { lat: 12.9765, lon: 77.5927 }, { lat: 12.9775, lon: 77.5922 }, { lat: 12.9785, lon: 77.5917 }, { lat: 12.9793, lon: 77.5913 } ], severity: 'High', roadName: 'Palace Road' },
@@ -50,6 +49,12 @@ const tileLayers: Record<MapStyle, { url: string; attribution: string }> = {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     },
+};
+
+const severityStyles = {
+  High: { color: '#ef4444', glowClass: 'animate-pulse-glow-red' },
+  Medium: { color: '#f97316', glowClass: '' },
+  Low: { color: '#eab308', glowClass: '' },
 };
 
 
@@ -73,19 +78,31 @@ export default function HazardMap() {
 
         mockPotholePaths.forEach(potholePath => {
             const latLngs = potholePath.path.map(p => L.latLng(p.lat, p.lon));
+            const style = severityStyles[potholePath.severity];
             
-            // Glow effect line (thicker, less opaque)
-            L.polyline(latLngs, { color: '#ef4444', weight: 20, opacity: 0.2 }).addTo(map);
+            // Glow effect line
+            const glow = L.polyline(latLngs, {
+                color: style.color,
+                weight: 20,
+                opacity: 0.2,
+                attribution: style.glowClass, // Use attribution to carry the class
+            }).addTo(map);
+            if (style.glowClass) {
+              (glow.getElement() as SVGPathElement)?.classList.add(style.glowClass);
+            }
+            
             // Main line
-            L.polyline(latLngs, { color: '#ef4444', weight: 4, opacity: 0.7 }).addTo(map);
+            L.polyline(latLngs, { color: style.color, weight: 4, opacity: 0.7 }).addTo(map);
             
-            const blackDots = L.polyline(latLngs, {
+            const marchingAnts = L.polyline(latLngs, {
               color: 'black',
               weight: 4,
               opacity: 0.7,
-              dashArray: '1, 10', // smaller dots, larger gaps
-              lineCap: 'round'
+              dashArray: '2, 8', // smaller dots, larger gaps
+              lineCap: 'round',
             }).addTo(map);
+
+            (marchingAnts.getElement() as SVGPathElement)?.classList.add('animate-marching-ants');
 
             const popupContent = ReactDOMServer.renderToString(
                 <div className="space-y-2 w-56 bg-card text-card-foreground p-1">
@@ -94,14 +111,14 @@ export default function HazardMap() {
                         <MapPin className="mr-2 h-4 w-4" />
                         <span>{potholePath.roadName}</span>
                     </div>
-                    <div className={cn("flex items-center text-sm text-red-500 font-medium")}>
+                    <div className={cn("flex items-center text-sm font-medium")} style={{ color: style.color }}>
                         <AlertCircle className="mr-2 h-4 w-4" />
                         <span>Severity: {potholePath.severity}</span>
                     </div>
                 </div>
             );
             
-            blackDots.bindPopup(popupContent, {
+            marchingAnts.bindPopup(popupContent, {
                  className: 'bg-card border-none rounded-lg shadow-lg'
             });
         });
